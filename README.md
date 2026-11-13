@@ -2,6 +2,12 @@
 
 A working React prototype for Uni Kwong Yuen’s centralised retail operations. Built with Vite, Tailwind CSS, Lucide React, and Recharts. Mock data is shared across modules and changes persist in this browser’s local storage.
 
+## Live Demo
+
+Explore the prototype hosted on Vercel: **[Open UKY Retail Workspace](https://baim-assign.vercel.app/)**.
+
+The demo starts with the Administrator profile. Use **Explore the demo** in the sidebar to try the sales, replenishment, and cross-store refund workflows. Changes are saved locally in your browser.
+
 ## Start
 
 Use Node.js 22 LTS and npm. No API keys or environment variables are required.
