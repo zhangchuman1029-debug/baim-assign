@@ -23,7 +23,7 @@ Open http://localhost:5173. `npm run build` creates a production build; `npm tes
 
 ## Demonstration guide
 
-The initial session is **Alex Chan / System Administrator**. Click the profile at the top right to preview any of the five roles and assign its store. Role simulation is intended for demonstration, not authentication or production security.
+The initial session is **Alex Chan / System Administrator**. Click the profile at the top right to open the **Prototype / demo role switcher**, select any of the five roles, and assign its store. Sales Staff land directly in POS; all other roles land in their own dashboard. Switching roles never resets shared business records. Role simulation is intended for demonstration, not authentication or production security.
 
 1. **Sale:** Open POS / Sales, choose a store, add items, and complete a mock checkout. The receipt preserves original prices. Sales history, stock movements, and reports update immediately.
 2. **Replenishment:** Create a request for a product/store without another active request. Submit it again to see duplicate detection. Open Manage, then Approve → Start processing → Dispatch stock → Confirm receipt. Dispatch deducts warehouse inventory; receipt adds store inventory. Try these stages using Head Office Manager, Warehouse Staff, and Store Manager profiles, or complete all as Administrator.
@@ -53,13 +53,15 @@ To restart the demonstration, clear the `uky-workspace-v1` browser local-storage
 
 | Role | Access |
 | --- | --- |
-| System Administrator | All modules and actions, including user management. |
-| Head Office Manager | Operational modules, reports, catalogue editing, request and refund approvals, and settings editing. |
-| Store Manager | Assigned-store sales, inventory, replenishment, refunds, and reports; settings viewing. |
-| Sales Staff | Assigned-store sales and history, cross-store transaction lookup for refunds, and settings viewing. |
-| Warehouse Staff | Warehouse inventory, replenishment processing and dispatch, dashboard, and settings viewing. |
+| System Administrator | Administration dashboard, all modules and actions, user roles, system settings, and manager refund approval configuration. |
+| Head Office Manager | All-store dashboard, operational modules, reports, catalogue/pricing management, replenishment and refund approvals. |
+| Store Manager | Local dashboard, assigned-store sales, inventory adjustments, replenishment requests/receipts, refunds, and reports. Refund approval follows administrator configuration. |
+| Sales Staff | POS first, local daily sales dashboard/history, product search in POS, cross-store refund lookup, and refund submission. No management approvals or settings. |
+| Warehouse Staff | Warehouse stock/dispatch dashboard, warehouse inventory adjustments, approved replenishment picking and dispatch. No POS, refunds, or settings. |
 
-Head office approves replenishment requests, warehouse staff process and dispatch them, and the receiving store manager confirms delivery. Pending refunds reserve quantities; rejection releases them. Approved refunds use historical sale prices and only return resellable items to stock. Permissions are enforced in both navigation and business actions.
+Head office approves replenishment requests, warehouse staff process and dispatch them, and the receiving store manager confirms delivery. Pending refunds reserve quantities; rejection releases them. Approved refunds use historical sale prices and only return resellable items to stock. Permissions are enforced in navigation, direct URL routing, shared-state selectors, and business action handlers. Store teams receive only assigned-store sales, inventory, movements, requests, returns, and activity. Warehouse staff receive warehouse inventory and approved transfer stages. Refund lookup deliberately searches receipts across stores without adding them to local sales history; refundable quantities are calculated against all pending and approved returns.
+
+Only the System Administrator can change **Settings → Store manager refund approval**. It defaults to enabled for existing browser data; disabling it hides manager approval controls and blocks direct approval attempts, while head office retains approval access. Switching roles or locations closes open work and pending delayed checkout actions cannot execute with an old role.
 
 ## Project structure
 
@@ -74,6 +76,9 @@ src/
 ├── data.js             # Seed data, locations, roles, and module permissions
 ├── domain.js           # Atomic business actions, validation, and permission checks
 ├── domain.test.js      # Business-rule tests
+├── permissions.js      # Role/action permissions, routing, scoped data, refund lookup
+├── permissions.test.js # Access boundaries and cross-role workflow tests
+├── RoleWorkspaces.jsx  # Administrator, sales, warehouse, and operational priorities
 ├── store.jsx           # Shared state, persistence, notifications, and CSV exports
 ├── main.jsx            # React entry point
 └── styles.css          # Visual system and responsive layouts
@@ -87,7 +92,7 @@ npm run build
 npm run preview
 ```
 
-Tests cover sales, historical prices, insufficient-stock rollback, permissions, duplicate requests, replenishment stock conservation, cross-store refunds, damaged returns, reserved refund quantities, unique product codes, serialisation, and Hong Kong reporting dates. The production build is generated in `dist/`; `npm run preview` serves that build locally.
+The 20 automated tests cover scoped data, unauthorised direct routes/actions, configured refund approvals, cross-role workflow continuity, sales, historical prices, insufficient-stock rollback, permissions, duplicate requests, replenishment stock conservation, cross-store refunds, damaged returns, reserved refund quantities, unique product codes, serialisation, and Hong Kong reporting dates. The production build is generated in `dist/`; `npm run preview` serves that build locally.
 
 ## Prototype limitations
 

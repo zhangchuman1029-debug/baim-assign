@@ -5,6 +5,7 @@ import {useApp,downloadCSV} from './store';
 import {STORES,TODAY,storeName,ACCESS} from './data';
 import {money,number,dateKey,timeLabel} from './domain';
 import {Button,PageHeading,CardHeading,StatCard,ProductIdentity,Badge,Select,Empty} from './components';
+import {AdminWorkspace,SalesWorkspace,WarehouseWorkspace,OperationalPriorities} from './RoleWorkspaces';
 export function useMetrics(days=7) {
   const {state,scope}=useApp();
   return useMemo(()=>{
@@ -27,8 +28,11 @@ export default function Dashboard({navigate}) {
   const pending=state.requests.filter(r=>r.status==='Pending'&&(scope==='all'||r.store===scope)).length;
   const activity=[...state.activity.filter(a=>!a.store||scope==='all'||a.store===scope),...m.sales.slice(0,5).map(s=>({id:s.id,type:'sale',label:'Sale completed',reference:s.id,createdAt:s.createdAt,store:s.store,total:s.total}))].sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt)).slice(0,4);
   const exportReport=()=>{downloadCSV('UKY-business-overview',m.performance.map(s=>({Store:s.name,Revenue:s.revenue,Transactions:s.transactions,Period:`${m.startKey} to ${TODAY}`})));notify('Business overview exported.');};
+  if(actor.role==='System Administrator')return <AdminWorkspace navigate={navigate}/>;
+  if(actor.role==='Sales Staff')return <SalesWorkspace navigate={navigate}/>;
+  if(actor.role==='Warehouse Staff')return <WarehouseWorkspace navigate={navigate}/>;
   return <>
-    <PageHeading eyebrow="YOUR RETAIL WORKSPACE" title="Business overview" description="A clear view of your business. Every store, in sync.">
+    <PageHeading eyebrow="YOUR RETAIL WORKSPACE" title={actor.role==='Store Manager'?`${storeName(actor.store)} store overview`:'Business overview'} description={actor.role==='Store Manager'?'Your store sales, inventory, replenishments, and customer returns.':'All-store performance, centralised inventory, and approvals.'}>
       <Button variant="secondary" icon={Download} onClick={exportReport}>Export report</Button>{ACCESS[actor.role].includes('pos')&&<Button icon={Plus} onClick={()=>navigate('pos')}>New sale</Button>}
     </PageHeading>
     <div className="overview-toolbar"><div className="live-label"><span className="live-dot"/>Live overview <span className="toolbar-divider"/> <span>{scope==='all'?'All 4 stores connected':storeName(scope)}</span></div><div className="date-control"><CalendarDays size={15}/><Select aria-label="Reporting period" value={days} onChange={e=>setDays(Number(e.target.value))}><option value={7}>Nov 7 – Nov 13, 2026</option><option value={14}>Oct 31 – Nov 13, 2026</option><option value={30}>Oct 15 – Nov 13, 2026</option></Select></div></div>
@@ -38,6 +42,7 @@ export default function Dashboard({navigate}) {
       <StatCard label="Units sold" value={number(m.units)} icon={ShoppingBag} change={m.trendUnits} tone="purple"/>
       <StatCard label="Low stock items" value={number(m.lowStock.length)} icon={TriangleAlert} tone="amber" note={<><span className="amber-text">Needs your attention</span>{ACCESS[actor.role].includes('inventory')&&<ArrowRight size={13}/>}</>} onClick={ACCESS[actor.role].includes('inventory')?()=>navigate('inventory',{lowOnly:true}):undefined}/>
     </div>
+    <OperationalPriorities navigate={navigate}/>
     <div className="dashboard-middle">
       <section className="card revenue-card"><CardHeading title="Revenue overview" description="Your sales performance over time"><div className="segmented">{['Revenue','Comparison'].map(x=><button key={x} className={chartMode===x?'active':''} onClick={()=>setChartMode(x)}>{x}</button>)}</div></CardHeading>
         <div className="chart-summary"><strong>{money(m.revenue)}</strong><span className={`trend ${m.trendRevenue<0?'negative':''}`}><ArrowUpRight size={14}/>{Math.abs(m.trendRevenue).toFixed(1)}%</span><span className="muted">vs. previous {days} days</span></div>

@@ -72,7 +72,7 @@ test('pending refunds reserve quantity and manager-approved cross-store returns 
   assert.equal(submitted.result.originalStore,'central');assert.equal(submitted.result.returnStore,'mongkok');
   assert.equal(refundable(s,sale.id,'p1'),0);assert.equal(stockAt(s,'p1','mongkok'),receiving);
   assert.throws(()=>refund(s,sale),/exceeds/);
-  assert.throws(()=>applyAction(s,sales,'refundStatus',{id:submitted.result.id,status:'Approved'}),/Manager approval/);
+  assert.throws(()=>applyAction(s,sales,'refundStatus',{id:submitted.result.id,status:'Approved'}),/permission|Manager approval/);
   s=applyAction(s,manager,'refundStatus',{id:submitted.result.id,status:'Approved'}).state;
   assert.equal(stockAt(s,'p1','mongkok'),receiving+2);assert.equal(stockAt(s,'p1','central'),soldStore);
   assert.equal(s.refunds[0].saleId,sale.id);assert.equal(s.refunds[0].total,378);
@@ -101,7 +101,7 @@ test('role boundaries are enforced for catalogue, user administration, settings 
   const s=initialState();
   assert.throws(()=>applyAction(s,sales,'product',s.products[0]),/permission/);
   assert.throws(()=>applyAction(s,office,'user',s.users[0]),/permission/);
-  assert.throws(()=>applyAction(s,manager,'settings',{businessName:'Updated'}),/head office/);
+  assert.throws(()=>applyAction(s,manager,'settings',{businessName:'Updated'}),/permission/);
   assert.throws(()=>applyAction(s,warehouse,'adjustStock',{location:'central',productId:'p1',quantity:1,reason:'Count'}),/only adjust warehouse/);
   assert.throws(()=>applyAction(s,manager,'adjustStock',{location:'central',productId:'p1',quantity:1,reason:'Count'}),/assigned location/);
   assert.throws(()=>applyAction(s,admin,'user',{...s.users[0],active:false}),/cannot deactivate/);

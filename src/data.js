@@ -9,10 +9,10 @@ export const LOCATIONS = [...STORES, { id: 'warehouse', name: 'Main warehouse', 
 export const ROLES = ['System Administrator', 'Head Office Manager', 'Store Manager', 'Sales Staff', 'Warehouse Staff'];
 export const ACCESS = {
   'System Administrator': ['dashboard','products','pos','sales','inventory','replenishment','refunds','reports','users','settings'],
-  'Head Office Manager': ['dashboard','products','pos','sales','inventory','replenishment','refunds','reports','settings'],
-  'Store Manager': ['dashboard','pos','sales','inventory','replenishment','refunds','reports','settings'],
-  'Sales Staff': ['dashboard','pos','sales','refunds','settings'],
-  'Warehouse Staff': ['dashboard','inventory','replenishment','settings'],
+  'Head Office Manager': ['dashboard','products','pos','sales','inventory','replenishment','refunds','reports'],
+  'Store Manager': ['dashboard','pos','sales','inventory','replenishment','refunds','reports'],
+  'Sales Staff': ['dashboard','pos','sales','refunds'],
+  'Warehouse Staff': ['dashboard','inventory','replenishment'],
 };
 export const isOffice = role => ['System Administrator','Head Office Manager'].includes(role);
 export const storeName = id => LOCATIONS.find(s => s.id === id)?.name || id;
