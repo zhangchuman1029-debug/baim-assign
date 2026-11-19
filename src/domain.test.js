@@ -23,6 +23,12 @@ test('sale stores original prices, deducts exact inventory, adds revenue and a l
   assert.equal(stockAt(s,'p1','central'),before,'input state is immutable');
 });
 
+test('sale records the Other payment method',()=>{
+  const out=applyAction(initialState(),admin,'sale',{store:'central',items:[{productId:'p1',quantity:1}],payment:'Other'});
+  assert.equal(out.result.payment,'Other');
+  assert.equal(out.state.sales[0].payment,'Other');
+});
+
 test('insufficient stock cannot partially deduct another item or create a sale',()=>{
   const s=initialState(),before=structuredClone(s);
   assert.throws(()=>checkout(s,[{productId:'p1',quantity:1},{productId:'p2',quantity:9999}]),/Insufficient stock/);

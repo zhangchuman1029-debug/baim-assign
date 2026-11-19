@@ -8,6 +8,22 @@ Explore the prototype hosted on Vercel: **[Open UKY Retail Workspace](https://ba
 
 The demo starts with the Administrator profile. Use **Explore the demo** in the sidebar to try the sales, replenishment, and cross-store refund workflows. Changes are saved locally in your browser.
 
+## Standalone HTML submission
+
+Open **[UKY_Retail_Management.html](UKY_Retail_Management.html)** in Chrome or Edge by double-clicking the downloaded file. Download the actual file from GitHub using **Download raw file**. No server, Node.js installation, or internet connection is needed to use it. JavaScript must be enabled.
+
+This single HTML file contains the existing React application, styles, icons, charts, product images, and fonts. All five demo roles and the sale, replenishment, and cross-store refund workflows remain interactive. Submit or share this file on its own; the source folders are not needed to run it.
+
+Records are saved in the browser on this device. Keep using the same browser and file location to retain demo records; local-file storage behaviour varies by browser, and moving the file or clearing browser data may create a fresh workspace. The offline copy and Vercel website have separate local data.
+
+After editing the source application, regenerate the HTML with:
+
+```sh
+npm run build:html
+```
+
+The export uses the bundled images and fonts in `scripts/html-assets/`, so rebuilding requires no asset downloads once npm dependencies are installed. The normal Vite/Vercel build remains available through `npm run build`.
+
 ## Start
 
 Use Node.js 22 LTS and npm. No API keys or environment variables are required.
@@ -39,7 +55,7 @@ Dashboard, Product management, POS / Sales, Sales history, Inventory, Replenishm
 
 Shared state and persistence live in `src/store.jsx`; pure, atomic business actions and role checks live in `src/domain.js`. A failed action cannot partially change inventory. No real payment gateway, authentication server, ERP, or remote data storage is implemented. User accounts and roles are local demonstration records. CSV exports mitigate spreadsheet formula injection.
 
-To restart the demonstration, clear the `uky-workspace-v1` browser local-storage entry and reload. Settings can export a JSON backup of the current workspace. Product images and optional fonts load from Unsplash and Google Fonts; the interface retains local text and icon fallbacks.
+To restart the demonstration, clear the `uky-workspace-v1` browser local-storage entry and reload. Settings can export a JSON backup of the current workspace. The hosted version loads product images and optional fonts from Unsplash and Google Fonts; the standalone HTML embeds these assets for offline use.
 
 ## Technology stack
 

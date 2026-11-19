@@ -24,7 +24,7 @@ export function applyAction(state,actor,type,payload) {
   };
   let result;
   if(type==='sale') {
-    allow('pos');requireThat(inScope(actor,payload.store),'You can only sell at your assigned store.');requireThat(STORES.some(x=>x.id===payload.store),'Choose a valid store.');requireThat(payload.items?.length,'Add an item to the cart.');requireThat(['Card','Cash','Octopus'].includes(payload.payment),'Choose a payment method.');
+    allow('pos');requireThat(inScope(actor,payload.store),'You can only sell at your assigned store.');requireThat(STORES.some(x=>x.id===payload.store),'Choose a valid store.');requireThat(payload.items?.length,'Add an item to the cart.');requireThat(['Card','Cash','Octopus','Other'].includes(payload.payment),'Choose a payment method.');
     const ids=new Set();const items=payload.items.map(i=>{requireThat(!ids.has(i.productId),'Duplicate cart items.');ids.add(i.productId);const p=s.products.find(p=>p.id===i.productId);requireThat(p?.active,'A product is no longer available.');requireThat(whole(i.quantity),'Quantities must be positive whole numbers.');return {productId:p.id,name:p.name,code:p.code,price:p.price,cost:p.cost,quantity:Number(i.quantity)};});
     result={id:id('UKY'),store:payload.store,items,total:items.reduce((n,i)=>n+i.price*i.quantity,0),payment:payload.payment,createdAt:now,staff:actor.name};
     items.forEach(i=>move(i.productId,payload.store,-i.quantity,'Sale',result.id));s.sales.unshift(result);
